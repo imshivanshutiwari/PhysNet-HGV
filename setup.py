@@ -1,0 +1,35 @@
+"""
+PhysNet-HGV Installation Script.
+
+Setup for the Physics-Informed Neural Kalman Framework.
+"""
+
+from setuptools import setup, find_packages
+
+setup(
+    name="physnet-hgv",
+    version="1.0.0",
+    packages=find_packages(),
+    install_requires=[
+        "torch>=2.3.0",
+        "torchvision>=0.18.0",
+        "torchdiffeq>=0.2.3",
+        "deepxde>=1.11.1",
+        "diffusers>=0.27.2",
+        "transformers>=4.40.0",
+        "langchain>=0.1.20",
+        "langgraph>=0.0.55",
+        "filterpy>=1.4.5",
+        "numpy>=1.26.4",
+        "scipy>=1.13.0",
+        "matplotlib>=3.8.4",
+        "plotly>=5.22.0",
+        "pyyaml>=6.0.1",
+        "python-dotenv>=1.0.1",
+        "tqdm>=4.66.4",
+        "pytest>=8.2.0",
+    ],
+    author="Antigravity",
+    description="Physics-Informed Neural Kalman Framework for HGV Tracking",
+    license="MIT",
+)

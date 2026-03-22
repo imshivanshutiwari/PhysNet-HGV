@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────────────────
+# Multi-Sensor Configuration
+# ─────────────────────────────────────────────────────
+
+radar:
+  max_range_km: 800.0
+  update_rate_hz: 10.0
+  range_noise_std_m: 50.0
+  azimuth_noise_std_deg: 0.5
+  elevation_noise_std_deg: 0.5
+  doppler_noise_std_mps: 2.0
+  pfa: 1.0e-6
+  pd_clear: 0.95
+  pd_blackout: 0.0         # zero detection during plasma blackout
+  frame_size: [256, 256]
+  cfar:
+    guard_cells: 4
+    training_cells: 16
+    threshold_factor: 5.0
+
+infrared:
+  fov_deg: 5.0
+  angular_noise_std_deg: 0.1
+  update_rate_hz: 10.0
+  wavelength_um: 4.5        # MWIR band
+  sensitivity_nep_W: 1.0e-12
+  measurement_dim: 3         # [azimuth, elevation, intensity]
+
+optical:
+  resolution_m: 30.0         # native ground resolution
+  super_resolution_factor: 4  # SRGAN upscale
+  effective_resolution_m: 7.5
+  frame_size: [64, 64]
+  snr_db: 25.0
+  measurement_dim: 2          # [x_pixel, y_pixel]
+  dropout_probability: 0.2
+
+fusion:
+  method: "cross_modal_transformer"
+  confidence_weights: true
+  sensor_priority: ["radar", "infrared", "optical"]

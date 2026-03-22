@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────
+# HGV 6-DOF Trajectory Simulation Configuration
+# ─────────────────────────────────────────────────────
+
+vehicle:
+  mass_kg: 907.0
+  reference_area_m2: 0.88
+  nose_radius_m: 0.05
+  length_m: 3.5
+  # Moments of inertia [kg·m²]
+  Ixx: 120.0
+  Iyy: 850.0
+  Izz: 850.0
+  Ixz: 0.0
+
+aerodynamics:
+  # Lift & drag coefficient tables (Mach-dependent)
+  cd0: 0.015           # zero-lift drag coefficient
+  k_induced: 0.045     # induced drag factor  CD = CD0 + k * CL²
+  cl_alpha: 0.08       # lift-curve slope [1/deg]
+  cl_max: 1.2
+  cm_alpha: -0.003     # pitching moment slope [1/deg]
+
+trajectory:
+  altitude_range_km: [30.0, 80.0]
+  velocity_range_mach: [5.0, 20.0]
+  bank_angle_range_deg: [-30.0, 30.0]
+  n_trajectories: 10000
+  dt_s: 0.1
+  t_max_s: 600.0
+
+atmosphere:
+  model: "us_standard_1976"
+  gamma: 1.4
+  R_specific: 287.058   # J/(kg·K)
+  sea_level_temperature_K: 288.15
+  sea_level_pressure_Pa: 101325.0
+  sea_level_density_kg_m3: 1.225
+  lapse_rate_K_per_m: 0.0065
+
+gravity:
+  model: "wgs84"
+  g0: 9.80665
+  Re_m: 6378137.0     # WGS-84 equatorial radius
+  f: 0.003352810665   # flattening factor
+
+integration:
+  method: "RK45"
+  rtol: 1.0e-8
+  atol: 1.0e-10
+  max_step: 0.5
+
+output:
+  save_dir: "data/trajectories"
+  format: "npz"
+  fields: ["t", "x", "y", "z", "vx", "vy", "vz", "phi", "theta", "psi", "p", "q", "r"]

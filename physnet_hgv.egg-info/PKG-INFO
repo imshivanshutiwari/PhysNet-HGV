@@ -1,0 +1,27 @@
+Metadata-Version: 2.4
+Name: physnet-hgv
+Version: 1.0.0
+Summary: Physics-Informed Neural Kalman Framework for HGV Tracking
+Author: Antigravity
+License: MIT
+Requires-Dist: torch>=2.3.0
+Requires-Dist: torchvision>=0.18.0
+Requires-Dist: torchdiffeq>=0.2.3
+Requires-Dist: deepxde>=1.11.1
+Requires-Dist: diffusers>=0.27.2
+Requires-Dist: transformers>=4.40.0
+Requires-Dist: langchain>=0.1.20
+Requires-Dist: langgraph>=0.0.55
+Requires-Dist: filterpy>=1.4.5
+Requires-Dist: numpy>=1.26.4
+Requires-Dist: scipy>=1.13.0
+Requires-Dist: matplotlib>=3.8.4
+Requires-Dist: plotly>=5.22.0
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: tqdm>=4.66.4
+Requires-Dist: pytest>=8.2.0
+Dynamic: author
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: summary

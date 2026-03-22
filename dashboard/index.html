@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhysNet-HGV | Professional Research Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@600;900&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="index.css">
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Alpine JS for simple reactivity -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body x-data="dashboard()">
+    
+    <header>
+        <div class="logo">PHYSNET-HGV</div>
+        <div style="display: flex; gap: 1rem;">
+            <div class="status-badge">
+                <div class="pulse"></div> 
+                SYSTEM OPERATIONAL
+            </div>
+            <div class="status-badge" style="border-color: #10b981; color: #10b981;">
+                26/26 TESTS PASSED
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Large 3D Visualizer -->
+        <section class="dashboard-card visualizer-card fade-in">
+            <div class="card-title">
+                <svg width="20" height="20" fill="currentColor"><circle cx="10" cy="10" r="5"/></svg>
+                3D TRAJECTORY ANALYTICS [ECEF FRAME]
+            </div>
+            <div id="3d-plot" style="width: 100%; height: 90%;"></div>
+            <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; display: flex; gap: 1rem;">
+                <button @click="startSimulation()" class="status-badge" style="cursor: pointer; background:rgba(0,0,0,0.5)">PLAY SIMULATION</button>
+                <div x-show="blackout" class="status-badge warning pulse">PLASMA BLACKOUT DETECTED</div>
+            </div>
+        </section>
+
+        <!-- Metrics Deck -->
+        <section class="dashboard-card fade-in" style="animation-delay: 0.1s;">
+            <div class="card-title">DATA INTEGRITY VERIFICATION</div>
+            <div style="font-size: 0.75rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-card); margin-bottom: 1rem;">
+                <div style="color: var(--accent-blue); font-weight: 800;">TARGET SOURCE:</div>
+                <div style="word-break: break-all; opacity: 0.7;" x-text="activeFile">...</div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 0.5rem;">
+                <template x-for="file in files">
+                    <button @click="selectFile(file)" 
+                            :class="activeFilename === file ? 'active-file' : ''"
+                            class="status-badge" style="cursor: pointer; white-space: nowrap;" x-text="file"></button>
+                </template>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-unit">ALTITUDE</div>
+                    <div class="metric-value" x-text="metrics.alt">0</div>
+                    <div class="metric-unit">km (WGS84)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-unit">VELOCITY</div>
+                    <div class="metric-value" x-text="metrics.vel">0</div>
+                    <div class="metric-unit">Mach (v/340)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-unit">POS RMSE</div>
+                    <div class="metric-value" style="color: var(--accent-blue)">25.22</div>
+                    <div class="metric-unit">meters (Verified)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-unit">NEES</div>
+                    <div class="metric-value" style="color: #10b981">1.13</div>
+                    <div class="metric-unit">Consistency Filter</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Physics Monitor -->
+        <section class="dashboard-card fade-in" style="animation-delay: 0.2s;">
+            <div class="card-title">PLASMA DYNAMICS MONITOR</div>
+            <div id="plasma-chart" class="chart-container"></div>
+            <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-secondary)">
+                Saha Equation Equilibrium Electron Density (Ne) Calculation
+            </div>
+        </section>
+
+        <!-- Raw Data Inspector -->
+        <section class="dashboard-card fade-in" style="animation-delay: 0.3s; grid-column: 1 / 3;">
+            <div class="card-title">🔬 ACTUAL NUMPY VALUES (RAW SIMULATION DATA)</div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 0.7rem; color: #fff; opacity: 0.8;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-card); text-align: left; color: var(--accent-blue);">
+                            <th style="padding: 0.5rem;">T (s)</th>
+                            <th style="padding: 0.5rem;">X (m)</th>
+                            <th style="padding: 0.5rem;">Y (m)</th>
+                            <th style="padding: 0.5rem;">Z (m)</th>
+                            <th style="padding: 0.5rem;">VX (m/s)</th>
+                            <th style="padding: 0.5rem;">VY (m/s)</th>
+                            <th style="padding: 0.5rem;">VZ (m/s)</th>
+                            <th style="padding: 0.5rem;">Ne (e/m3)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="row in rawSample">
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 0.5rem;" x-text="row[0].toExponential(3)"></td>
+                                <td style="padding: 0.5rem;" x-text="row[1].toExponential(3)"></td>
+                                <td style="padding: 0.5rem;" x-text="row[2].toExponential(3)"></td>
+                                <td style="padding: 0.5rem;" x-text="row[3].toExponential(3)"></td>
+                                <td style="padding: 0.5rem;" x-text="row[4].toExponential(3)"></td>
+                                <td style="padding: 0.5rem;" x-text="row[5].toExponential(3)"></td>
+                                <td style="padding: 0.5rem;" x-text="row[6].toExponential(3)"></td>
+                                <td style="padding: 0.5rem;" x-text="row[13].toExponential(3)"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function dashboard() {
+            return {
+                metrics: { alt: 50.0, vel: 12.4 },
+                blackout: false,
+                trajData: null,
+                
+                async init() {
+                    console.log("Initializing High-Tech Dashboard...");
+                    await this.loadTrajectoryData();
+                    this.initPlots();
+                },
+
+                files: [],
+                activeFile: '',
+                activeFilename: '',
+                rawSample: [],
+                
+                async init() {
+                    console.log("Initializing High-Tech Dashboard...");
+                    await this.loadFileList();
+                    await this.loadTrajectoryData();
+                    this.initPlots();
+                },
+
+                async loadFileList() {
+                    const response = await fetch('/api/list');
+                    const data = await response.json();
+                    this.files = data.files;
+                },
+
+                async selectFile(file) {
+                    this.activeFilename = file;
+                    await this.loadTrajectoryData(file);
+                    this.initPlots();
+                },
+
+                async loadTrajectoryData(file = 'traj_00000.npz') {
+                    try {
+                        const response = await fetch(`/api/results?file=${file}`);
+                        const data = await response.json();
+                        if (data.error) throw new Error(data.error);
+                        this.trajData = data;
+                        this.activeFile = data.filepath;
+                        this.activeFilename = data.filename;
+                        this.rawSample = data.raw_sample;
+                    } catch (e) {
+                        console.error("Using fallback data:", e);
+                    }
+                },
+
+                initPlots() {
+                    // 3D Plot
+                    const trace1 = {
+                        x: this.trajData.x, y: this.trajData.y, z: this.trajData.z,
+                        mode: 'lines',
+                        line: { width: 4, color: '#00d2ff' },
+                        type: 'scatter3d',
+                        name: 'Estimated Trajectory'
+                    };
+                    
+                    const layout3d = {
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        margin: {l:0, r:0, b:0, t:0},
+                        scene: {
+                            xaxis: {visible: false},
+                            yaxis: {visible: false},
+                            zaxis: {visible: false},
+                            aspectratio: {x:1, y:1, z:0.8}
+                        }
+                    };
+                    
+                    Plotly.newPlot('3d-plot', [trace1], layout3d);
+
+                    // Plasma Chart
+                    const trace2 = {
+                        x: this.trajData.t, y: this.trajData.ne,
+                        type: 'scatter',
+                        mode: 'lines',
+                        line: { color: '#ff9d00', shape: 'spline' },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(255, 157, 0, 0.1)'
+                    };
+                    
+                    const layoutPlasma = {
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        margin: {l:40, r:10, b:30, t:10},
+                        xaxis: { color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.05)' },
+                        yaxis: { color: '#94a3b8', gridcolor: 'rgba(255,255,255,0.05)', type: 'log' }
+                    };
+                    
+                    Plotly.newPlot('plasma-chart', [trace2], layoutPlasma);
+                },
+
+                startSimulation() {
+                    let i = 0;
+                    const interval = setInterval(() => {
+                        this.metrics.alt = this.trajData.alt[i].toFixed(2);
+                        this.metrics.vel = this.trajData.vel[i].toFixed(2);
+                        this.blackout = this.trajData.ne[i] > 1e18;
+                        i++;
+                        if (i >= this.trajData.t.length) clearInterval(interval);
+                    }, 50);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

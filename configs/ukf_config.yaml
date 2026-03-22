@@ -1,0 +1,43 @@
+# ─────────────────────────────────────────────────────
+# Unscented Kalman Filter + Singer Model Configuration
+# ─────────────────────────────────────────────────────
+
+state:
+  dim: 9                # [x, y, z, vx, vy, vz, ax, ay, az]
+  measurement_dim: 3    # [x_meas, y_meas, z_meas]
+
+sigma_points:
+  # Julier-Uhlmann scaled parameters
+  alpha: 0.001
+  kappa: 0
+  beta: 2.0
+
+singer:
+  # Singer acceleration model parameters
+  alpha_singer: 0.05     # reciprocal of manoeuvre time constant [1/s]
+  sigma_m_squared: 100.0 # maximum acceleration variance [m²/s⁴]
+
+filter:
+  dt: 0.1               # time step [s]
+  fading_memory_lambda: 0.98
+  nees_chi2_threshold: 11.07   # 95% bound for 3-DOF χ²
+
+process_noise:
+  spectral_density: 100.0      # Singer Q spectral density
+  adaptive: true
+  innovation_window: 20
+
+measurement_noise:
+  R_diag: [2500.0, 2500.0, 2500.0]   # 50 m std → 2500 m² variance
+
+initialisation:
+  P0_pos: 10000.0      # initial position uncertainty [m²]
+  P0_vel: 100.0        # initial velocity uncertainty [(m/s)²]
+  P0_acc: 25.0         # initial acceleration uncertainty [(m/s²)²]
+
+blackout:
+  pinn_update_interval: 5     # use PINN prediction every N steps
+  covariance_inflation: 1.5   # inflate P during blackout
+
+logging:
+  checkpoint_dir: "checkpoints/ukf"

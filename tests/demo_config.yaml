@@ -1,0 +1,32 @@
+aerodynamics:
+  cd0: 0.015
+  cl_alpha: 0.08
+  k_induced: 0.045
+atmosphere:
+  model: us_standard_1976
+integration:
+  atol: 1.0e-08
+  method: RK45
+  rtol: 1.0e-06
+output:
+  save_dir: tests/demo_output
+pinn:
+  Ne_threshold: 1.0e+18
+sensor:
+  radar:
+    noise_angle_deg: 0.01
+    noise_doppler: 1.0
+    noise_range: 5.0
+    position_ecef:
+    - 0
+    - 0
+    - 0
+    snr_base_db: 40.0
+trajectory:
+  dt_s: 0.1
+vehicle:
+  Ixx: 120.0
+  Iyy: 850.0
+  Izz: 850.0
+  mass_kg: 907.0
+  reference_area_m2: 0.88

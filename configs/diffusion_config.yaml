@@ -1,0 +1,43 @@
+# ─────────────────────────────────────────────────────
+# Denoising Diffusion Probabilistic Model Configuration
+# ─────────────────────────────────────────────────────
+
+diffusion:
+  T: 1000                   # total diffusion time steps
+  beta_start: 1.0e-4
+  beta_end: 0.02
+  schedule: "linear"        # linear | cosine
+
+unet:
+  in_channels: 9             # state dimension
+  hidden_channels: 128
+  n_res_blocks: 4
+  time_embed_dim: 128
+  cond_dim: 18               # conditioning vector dimension
+  attention_heads: 4
+  dropout: 0.1
+
+sampling:
+  n_samples: 500
+  guidance_scale: 1.0
+  clip_denoised: true
+
+training:
+  optimizer: "adam"
+  learning_rate: 2.0e-4
+  epochs: 100
+  batch_size: 256
+  grad_clip_norm: 1.0
+  ema_decay: 0.9999
+  scheduler: "linear_warmup"
+  warmup_steps: 1000
+
+reacquisition:
+  max_search_radius_m: 500.0
+  confidence_threshold: 0.9
+  n_candidates: 50
+
+logging:
+  wandb_project: "physnet-hgv-ddpm"
+  log_interval: 10
+  checkpoint_dir: "checkpoints/ddpm"
