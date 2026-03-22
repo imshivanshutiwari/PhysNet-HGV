@@ -1,0 +1,10 @@
+altitude_range_km: [30, 80]
+velocity_range_mach: [5, 20]
+bank_angle_range_deg: [-30, 30]
+n_trajectories: 10000
+dt: 0.1
+max_duration_s: 300
+mass_kg: 907
+ref_area_m2: 0.88
+target_range_km: 500
+splits: [0.70, 0.15, 0.15]

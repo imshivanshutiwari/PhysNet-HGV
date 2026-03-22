@@ -1,0 +1,8 @@
+radar_range_km: 800
+radar_refresh_hz: 10
+radar_pos_noise_m: 50
+radar_vel_noise_ms: 5
+ir_bearing_noise_deg: 0.1
+optical_resolution_m: 30
+optical_sr_scale: 4
+sensor_dropout_prob: 0.2

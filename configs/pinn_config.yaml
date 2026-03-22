@@ -1,0 +1,11 @@
+n_layers: 6
+hidden_dim: 256
+activation: tanh
+lambda_momentum: 1.0
+lambda_continuity: 0.5
+lambda_plasma: 0.8
+lr: 1e-4
+n_epochs: 200
+batch_size: 64
+optimizer: adamw
+blackout_Ne_threshold: 1e18
